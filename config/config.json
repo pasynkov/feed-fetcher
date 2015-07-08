@@ -12,12 +12,7 @@
     "fetcher":{
         "feeds": [
             {
-                "name": "bitcoinwarrior.net",
-                "link": "http://bitcoinwarrior.net/feed/",
-                "fetcher": "bitcoinwarrior"
-            },
-            {
-                "name": "bitcoinwarrior.net_by_default",
+                "name": "bitcoinwarrior_default",
                 "link": "http://bitcoinwarrior.net/feed/"
             }
         ]
