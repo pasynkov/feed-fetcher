@@ -1,0 +1,24 @@
+{
+  "name": "feed-fetcher",
+  "version": "0.0.1",
+  "description": "Feed fetching new sites",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pasynkov/feed-fetcher"
+  },
+  "keywords": [
+    "feed",
+    "fetch",
+    "news"
+  ],
+  "author": "Nikolay Pasynkov <a@pasa.me>",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/pasynkov/feed-fetcher/issues"
+  },
+  "homepage": "https://github.com/pasynkov/feed-fetcher"
+}
