@@ -2,6 +2,10 @@
 request = require "request"
 FeedParser = require "feedparser"
 async = require "async"
+moment = require "moment"
+_ = require "underscore"
+
+ItemValidator = require "../schemas/item"
 
 class Fetcher
 
@@ -92,5 +96,42 @@ class Fetcher
       callback null, items
 
 
+  storeItems: (items, callback)=>
+
+    unless items.length
+      return callback()
+
+    items = _.compact _.map(
+      items
+      (item)=>
+        item.created = moment(item.created).format("YYYY-mm-dd HH:ii:ss")
+        item.updated = moment().format("YYYY-mm-dd HH:ii:ss")
+        item.added = moment().format("YYYY-mm-dd HH:ii:ss")
+        item.fetcher = @name
+
+        validator = new ItemValidator item
+
+        if validator.valid
+          return item
+        else
+
+          @logger.warn "Item isnt valid: `#{JSON.stringify validator.errors}`"
+
+          return false
+    )
+
+    unless items.length
+      callback "Store failed. All items are not valid."
+
+    if core.mysql.connected()
+
+      @logger.info "Start store to mysql `#{items.length}`"
+
+      core.mysql.insertRows "items", items, callback
+
+    else
+      @logger.info "Start store to static files `#{items.length}`"
+
+      callback "Not connected"
 
 module.exports = Fetcher

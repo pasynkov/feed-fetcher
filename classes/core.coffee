@@ -2,6 +2,7 @@
 defaulConfig = require "../config/config.json"
 
 DefaultFeedFetcher = require "../fetchers/default_fetcher"
+Mysql = require "./mysql"
 
 winston = require "winston"
 async = require "async"
@@ -27,11 +28,19 @@ class Core
     )
 
 
+
   initialize: (callback)->
+
+    initializers = []
+
+    @mysql = new Mysql
+
+    if @config.mysql
+      initializers.push @mysql.connect
 
     @logger.info "Start initialize FeedFetcher"
 
-    callback()
+    async.parallel initializers, callback
 
 
   createLogger: (loggerOpts)->

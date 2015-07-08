@@ -1,5 +1,7 @@
 Fetcher = require "../classes/fetcher"
 
+async = require "async"
+_ = require "underscore"
 
 class DefaultFetcher extends Fetcher
 
@@ -19,10 +21,39 @@ class DefaultFetcher extends Fetcher
 
     @logger.info "Start fetch by `#{@name}` fetcher"
 
-    @getItems (err, items)=>
-      @logger.info "fetched `#{items.length}` items"
+    async.waterfall(
+      [
+        @getItems
 
-  getItems: (callback)->
+        (items, taskCallback)=>
+
+          @logger.info "Received `#{items.length}` items by `#{@name}` fetcher"
+
+          @storeItems items, taskCallback
+      ]
+      callback
+    )
+
+  getItems: (callback)=>
+
+    @logger.info "Get items for `#{@name}` fetcher"
+
     super @link, callback
+
+  storeItems: (items, callback)->
+
+    @logger.info "Start store items for `#{@name}` fetcher"
+
+    super _.map(
+      items
+      (item)->
+        return {
+        title: item.title
+        content: item.summary
+        created: new Date(item.pubdate)
+        link: item.link
+        author: item.author
+        }
+    ), callback
 
 module.exports = DefaultFetcher
