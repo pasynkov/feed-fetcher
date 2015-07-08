@@ -1,0 +1,26 @@
+{
+    "webServer": {
+        "port": 8001
+    },
+    "mysql": {
+        "host": "rangg.ru",
+        "port": 3306,
+        "user": "root",
+        "password": "085bdb2261",
+        "database": "bf-test"
+    },
+    "fetcher":{
+        "feeds": [
+            {
+                "name": "bitcoinwarrior.net",
+                "link": "http://bitcoinwarrior.net/feed/",
+                "fetcher": "bitcoinwarrior"
+            },
+            {
+                "name": "bitcoinwarrior.net_by_default",
+                "link": "http://bitcoinwarrior.net/feed/"
+            }
+        ]
+    }
+
+}
