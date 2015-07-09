@@ -19,10 +19,10 @@
         "staticDir": "content"
     },
     "cron": {
-        "runOn": "00 00 * * * *",
+        "runOn": "00 00 */2 * * *",
         "script": "scheduler"
     },
     "ui": {
-        "perPage": 10
+        "perPage": "10"
     }
 }

@@ -9,7 +9,7 @@
     </div>
     <div class="form-group">
         <label for="staticDir">Директория для хранения новостей</label>
-        <input type="text" class="form-control" id="staticDir" placeholder="10" name="content" value="{{staticDir}}">
+        <input type="text" class="form-control" id="staticDir" placeholder="10" name="staticDir" value="{{staticDir}}">
     </div>
     <button type="submit" class="btn btn-default">Сохранить</button>
 </form>

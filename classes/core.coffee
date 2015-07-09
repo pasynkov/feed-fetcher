@@ -217,5 +217,8 @@ class Core
             err = "Cannot parse file"
         callback err, content
 
+  saveSettings: (callback)=>
+    fs.writeFile path.join(__dirname, "..", "config/config.json"), JSON.stringify(@config, "    ", "    "), encoding: "utf8", callback
+
 
 module.exports = Core

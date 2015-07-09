@@ -1,5 +1,6 @@
 
 express = require "express"
+bodyParser = require "body-parser"
 
 Context = require "./context"
 router = require "../config/router"
@@ -11,6 +12,8 @@ class WebServer
   constructor: ->
 
     @server = express()
+
+    @server.use bodyParser.urlencoded(extended: true)
 
     @config = core.config.webServer
 

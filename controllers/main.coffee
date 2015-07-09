@@ -28,7 +28,7 @@ class MainController
       @context.sendData
     )
 
-  settings: ->
+  settings: (incomingError)->
 
     async.waterfall(
       [
@@ -49,7 +49,8 @@ class MainController
 
           taskCallback null, indexTemplate({menu, content: settings})
       ]
-      @context.sendData
+      (err, data)=>
+        @context.sendData incomingError or err, data
     )
 
   getItems: ->
@@ -87,12 +88,17 @@ class MainController
     )
 
   getItem: ->
-    async.waterfall(
-      [
-        async.apply core.getItem, @context.requester.params.id
-      ]
-      @context.sendData
-    )
+    core.getItem @context.requester.params.id, @context.sendData
+
+  saveSettings: =>
+
+    core.config.ui.perPage = @context.requester.body.perPage
+    core.config.cron.runOn = @context.requester.body.cron
+    core.config.fetcher.staticDir = @context.requester.body.staticDir
+
+    core.saveSettings (err)=>
+      @settings err
+
 
 
 
