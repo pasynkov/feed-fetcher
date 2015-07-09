@@ -30,6 +30,15 @@ class DefaultFetcher extends Fetcher
           @logger.info "Received `#{items.length}` items by `#{@name}` fetcher"
 
           @storeItems items, taskCallback
+
+        (items, taskCallback)=>
+
+          added = _.compact items
+
+          @logger.info "Successfully added #{added.length} items by `#{@name}` fetcher"
+
+          taskCallback()
+
       ]
       callback
     )

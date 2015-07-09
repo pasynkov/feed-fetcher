@@ -15,7 +15,8 @@
                 "name": "bitcoinwarrior_default",
                 "link": "http://bitcoinwarrior.net/feed/"
             }
-        ]
+        ],
+        "staticDir": "content"
     }
 
 }

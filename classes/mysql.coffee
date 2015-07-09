@@ -1,6 +1,7 @@
 
 mysql = require "mysql"
 _ = require "underscore"
+async = require "async"
 
 
 class Mysql
@@ -54,9 +55,25 @@ class Mysql
         )
     )
 
-    query = @client.query "INSERT INTO ?? (??) VALUES ?", [tableName, names, rows], (err)->
-      console.log err
+    @client.query "INSERT INTO ?? (??) VALUES ?", [tableName, names, rows], callback
 
+  insertRowsByOne: (tableName, rows, callback)->
 
+    async.map(
+      rows
+      (row, done)=>
+        @client.query "INSERT INTO ?? SET ?", [tableName, row], done
+      callback
+    )
+
+  find: (tableName, where, callback)=>
+
+    keys = _.map(
+      _.keys(where)
+      (key, i)->
+        return "#{key} = ?"
+    ).join " AND "
+
+    @client.query "SELECT * FROM ?? WHERE #{keys}", _.flatten([tableName, _.values(where)]), callback
 
 module.exports = Mysql

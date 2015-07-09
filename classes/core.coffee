@@ -8,6 +8,8 @@ winston = require "winston"
 async = require "async"
 _ = require "underscore"
 
+fs = require "fs"
+
 class Core
 
   constructor: ->
@@ -77,6 +79,29 @@ class Core
 
             (new FeedFetcher feed.name, feed.link).fetch done
       )
+      callback
+    )
+
+  checkDirectory: (path, callback)=>
+
+    async.waterfall(
+      [
+        (taskCallback)->
+          fs.exists path, (exists)->
+            if exists
+              fs.lstat path, taskCallback
+            else
+              fs.mkdir path, (err)->
+                if err
+                  taskCallback err
+                else
+                  fs.lstat path, taskCallback
+        (stat, taskCallback)->
+          if stat.isDirectory()
+            taskCallback()
+          else
+            taskCallback "`#{path}` must be a directory"
+      ]
       callback
     )
 
