@@ -3,6 +3,7 @@ defaulConfig = require "../config/config.json"
 
 DefaultFeedFetcher = require "../fetchers/default_fetcher"
 Mysql = require "./mysql"
+WebServer = require "./web_server"
 
 winston = require "winston"
 async = require "async"
@@ -38,12 +39,19 @@ class Core
 
     @mysql = new Mysql
 
+    @webServer = new WebServer
+
     if @config.mysql
       initializers.push @mysql.connect
 
     if @config.cron
       for task in @config.cron
         initializers.push @createCronTask(task)
+
+
+
+    if @config.webServer
+      initializers.push @webServer.start
 
     @logger.info "Start initialize FeedFetcher"
 

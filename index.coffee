@@ -2,6 +2,8 @@ Core = (require "./classes/core")
 
 global.core = new Core
 
+core.logger.info "Start application"
+
 core.initialize (err)->
 
   if err
