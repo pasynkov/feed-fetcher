@@ -1,0 +1,93 @@
+<div id="list">
+    <div class="loader"></div>
+</div>
+<script id="list-template" type="text/x-handlebars-template">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Заголовок
+                </th>
+                <th>
+                    Автор
+                </th>
+                <th>
+                    Дата
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+                <tr style="cursor:pointer;" onclick="getItem('{{id}}')">
+                    <td style="overflow:hidden;width:30px;position:absolute;">{{id}}</td>
+                    <td>{{title}}</td>
+                    <td>{{author}}</td>
+                    <td>{{created}}</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+
+<script id="pagination-template" type="text/x-handlebars-template">
+    <ul class="pagination">
+        {{#each items}}
+            <li class="{{active}}">
+                <a href="{{link}}">{{value}}</a>
+            </li>
+        {{/each}}
+    </ul>
+</script>
+
+<script type="text/javascript">
+
+    var showError = function(error){
+        $("#modal").modal("show")
+        $("#modal .modal-title").html("Error incoming")
+        $("#modal .modal-body").html(error)
+    }
+
+    var getPage = function(page){
+
+        $("#list").html("<div class='loader'></div>");
+
+        $.get("/items/" + page, function(body){
+            if(body.error){
+                showError(body.error)
+            }else{
+
+                $("#list").html(
+                    Handlebars.compile($("#list-template").html())({items: body.result.items})
+                );
+
+                if(body.result.pagination){
+                    $("#list").append(
+                            Handlebars.compile($("#pagination-template").html())({items: body.result.pagination})
+                    )
+                }
+            }
+        })
+    }
+
+    var getItem = function(id){
+        $("#modal").modal("show")
+        $("#modal .modal-body").html("<div class='loader'></div>")
+        $.get("/item/" + id, function(body){
+            if(body.error){
+                showError(body.error)
+            }else{
+
+                $("#modal .modal-title").html(body.title)
+                $("#modal .modal-body").html(body.content)
+
+            }
+        })
+
+    }
+
+    getPage(0)
+
+</script>

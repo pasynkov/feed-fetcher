@@ -6,6 +6,7 @@ Mysql = require "./mysql"
 WebServer = require "./web_server"
 
 winston = require "winston"
+path = require "path"
 async = require "async"
 _ = require "underscore"
 CronJob = require("cron").CronJob
@@ -45,8 +46,7 @@ class Core
       initializers.push @mysql.connect
 
     if @config.cron
-      for task in @config.cron
-        initializers.push @createCronTask(task)
+      initializers.push @createCronTask(@config.cron)
 
 
 
@@ -144,6 +144,78 @@ class Core
       ]
       callback
     )
+
+  readFileIfExists: (path, callback)=>
+
+    fs.exists path, (exists)->
+      if exists
+        fs.readFile path, encoding: "utf8", callback
+      else
+        callback "File is not exists"
+
+  getItems: (skip, limit, callback)=>
+
+    if @mysql.connected()
+
+      @getItemsFromMysql skip, limit, callback
+
+    else
+
+      @getItemsFromStatic skip, limit, callback
+
+  getItemsFromMysql: (skip, limit, callback)=>
+
+    async.parallel(
+      {
+        items: (taskCallback)=>
+          @mysql.client.query "SELECT * FROM items ORDER BY created DESC LIMIT #{skip},#{limit}", taskCallback
+        count: (taskCallback)=>
+          @mysql.client.query "SELECT count(*) as count FROM items", taskCallback
+      }
+      (err, {items, count})=>
+        callback err, {
+          items: items?[0]
+          count: count?[0]?[0]?.count
+        }
+    )
+
+  getItemsFromStatic: (skip, limit, callback)=>
+    async.waterfall(
+      [
+        async.apply fs.readdir, path.join(__dirname, "..", core.config.fetcher.staticDir)
+        (files, taskCallback)->
+          taskCallback null, {
+            items: _.sortBy(
+              _.map(
+                files
+                (file)->
+                  item = require path.join(__dirname, "..", core.config.fetcher.staticDir, file)
+                  item.id = file.replace(".json", "")
+                  return item
+              )
+              (item)->
+                return new Date(item.created)
+            )[skip...(limit + skip)]
+            count: files.length
+          }
+      ]
+      callback
+    )
+
+  getItem: (id, callback)=>
+    if @mysql.connected()
+      @mysql.find "items", {id}, (err, [item])=>
+        if err
+          @logger.error "getItem crash with err: `#{err}`"
+        callback err, item
+    else
+      @readFileIfExists path.join(__dirname, "..", core.config.fetcher.staticDir, id + ".json"), (err, content)->
+        unless err
+          try
+            content = JSON.parse content
+          catch
+            err = "Cannot parse file"
+        callback err, content
 
 
 module.exports = Core

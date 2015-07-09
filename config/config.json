@@ -9,7 +9,7 @@
         "password": "085bdb2261",
         "database": "bf-test"
     },
-    "fetcher":{
+    "fetcher": {
         "feeds": [
             {
                 "name": "bitcoinwarrior_default",
@@ -18,10 +18,11 @@
         ],
         "staticDir": "content"
     },
-    "cron": [
-        {
-            "runOn": "00 00 * * * *",
-            "script": "scheduler"
-        }
-    ]
+    "cron": {
+        "runOn": "00 00 * * * *",
+        "script": "scheduler"
+    },
+    "ui": {
+        "perPage": 10
+    }
 }

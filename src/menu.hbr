@@ -1,0 +1,4 @@
+<ul class="nav nav-pills nav-stacked">
+    <li class="{{indexActive}}"><a href="/">Главная</a></li>
+    <li class="{{settingsActive}}"><a href="/settings">Настройки</a></li>
+</ul>

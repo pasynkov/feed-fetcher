@@ -1,3 +1,6 @@
+
+_ = require "underscore"
+
 class Context
 
   constructor: (@requester, @responser, @controllerName, @action)->
@@ -15,5 +18,18 @@ class Context
 
 
     @logger.info "incoming request to `#{@requester.url}`. Run controller `#{@controllerName}` with action `#{@action}`"
+
+  sendData: (err, data)=>
+    if err
+      @responser.status 404
+
+      if _.isObject(data)
+        data = {
+          error: err
+        }
+
+      @logger.error err
+
+    @responser.send data
 
 module.exports = Context

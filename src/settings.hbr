@@ -1,0 +1,15 @@
+<form method="post" action="">
+    <div class="form-group">
+        <label for="cron">Задание cron'a на сбор новостей</label>
+        <input type="text" class="form-control" id="cron" placeholder="00 00 * * * *" name="cron" value="{{cron}}">
+    </div>
+    <div class="form-group">
+        <label for="perPage">Новостей на страницу</label>
+        <input type="text" class="form-control" id="perPage" placeholder="10" name="perPage" value="{{perPage}}">
+    </div>
+    <div class="form-group">
+        <label for="staticDir">Директория для хранения новостей</label>
+        <input type="text" class="form-control" id="staticDir" placeholder="10" name="content" value="{{staticDir}}">
+    </div>
+    <button type="submit" class="btn btn-default">Сохранить</button>
+</form>
