@@ -17,6 +17,11 @@
             }
         ],
         "staticDir": "content"
-    }
-
+    },
+    "cron": [
+        {
+            "runOn": "00 00 * * * *",
+            "script": "scheduler"
+        }
+    ]
 }

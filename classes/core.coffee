@@ -7,6 +7,7 @@ Mysql = require "./mysql"
 winston = require "winston"
 async = require "async"
 _ = require "underscore"
+CronJob = require("cron").CronJob
 
 fs = require "fs"
 
@@ -40,10 +41,41 @@ class Core
     if @config.mysql
       initializers.push @mysql.connect
 
+    if @config.cron
+      for task in @config.cron
+        initializers.push @createCronTask(task)
+
     @logger.info "Start initialize FeedFetcher"
 
     async.parallel initializers, callback
 
+  createCronTask: (config)->
+
+    @logger.info "Add cron task `#{config.script}`"
+
+    return (taskCallback)=>
+      new CronJob({
+        cronTime: config.runOn
+        onTick: =>
+
+          @logger.info "Start cron task `#{config.script}`"
+
+          try
+            script = new (require "../scripts/#{config.script}")
+          catch e
+            @logger.error "Cron task `#{config.script}` fail with err: `#{e}`"
+
+          script.invoke (err)=>
+            if err
+              @logger.error "Cron task `#{config.script}` fail with err: `#{err}`"
+            else
+              @logger.info "Cron task `#{config.script}` successfully completed"
+
+        start: false
+        timeZone: "Europe/Moscow"
+      }).start()
+
+      taskCallback()
 
   createLogger: (loggerOpts)->
 
