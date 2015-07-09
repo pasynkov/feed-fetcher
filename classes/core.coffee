@@ -1,6 +1,3 @@
-
-defaulConfig = require "../config/config.json"
-
 DefaultFeedFetcher = require "../fetchers/default_fetcher"
 Mysql = require "./mysql"
 WebServer = require "./web_server"
@@ -33,7 +30,10 @@ class Core
     @property config
     @type {Object}
     ###
-    @config = defaulConfig
+    try
+      @config = require "../config/config.json"
+    catch e
+      throw new Error "Plase create `./config/config.json` from `./config/config.sample.json`"
 
     ###*
 

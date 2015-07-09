@@ -3,11 +3,11 @@
         "port": 8001
     },
     "mysql": {
-        "host": "rangg.ru",
+        "host": "localhost",
         "port": 3306,
-        "user": "root",
-        "password": "085bdb2261",
-        "database": "bf-test"
+        "user": "user",
+        "password": "password",
+        "database": "feed_fetcher"
     },
     "fetcher": {
         "feeds": [
