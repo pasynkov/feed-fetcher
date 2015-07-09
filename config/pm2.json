@@ -1,0 +1,12 @@
+[
+    {
+        "name": "feed_fetcher",
+        "cwd": "./",
+        "script": "index.coffee",
+        "instances": "1",
+        "error_file": "logs/err.log",
+        "out_file": "logs/out.log",
+        "exec_mode": "fork",
+        "port": 8001
+    }
+]
