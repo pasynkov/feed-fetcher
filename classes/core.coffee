@@ -13,14 +13,44 @@ CronJob = require("cron").CronJob
 
 fs = require "fs"
 
+###*
+Класс ядра проекта. Экземпляр обычно указывается как глобальная переменная проекта
+@class Core
+@constructor
+###
 class Core
 
+  ###*
+  Конструктор класса
+  @method constructor
+  ###
   constructor: ->
 
+    ###*
+
+    Общий конфиг проекта
+
+    @property config
+    @type {Object}
+    ###
     @config = defaulConfig
 
+    ###*
+
+    Логгеры проекта
+
+    @property loggers
+    @type {Object}
+    ###
     @loggers = {}
 
+    ###*
+
+    Основной логгер
+
+    @property logger
+    @type {Object}
+    ###
     @logger = @createLogger(
       {
         name: "main"
@@ -33,7 +63,15 @@ class Core
     )
 
 
+  ###*
 
+  Инициализирует проект. Подключается к бд, поднимает веб-сервер, объявляет крон-задания
+
+  @method initialize
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   initialize: (callback)->
 
     initializers = []
@@ -57,6 +95,14 @@ class Core
 
     async.parallel initializers, callback
 
+  ###*
+
+  Создает задание конфига для крона
+
+  @method createCronTask
+  @param config {Object} конфиг задания
+  @return task {Function} async-функция задания
+  ###
   createCronTask: (config)->
 
     @logger.info "Add cron task `#{config.script}`"
@@ -85,12 +131,30 @@ class Core
 
       taskCallback()
 
+  ###*
+
+  Создает логгер
+
+  @method createLogger
+  @param loggerOpts {Object} опции нужного логгера
+  @param loggerOpts.name {String} имя логгера
+  @param loggerOpts.options {Object} хар-ки логгера (уровень, цвет и т.д.)
+  ###
   createLogger: (loggerOpts)->
 
     @loggers[loggerOpts.name] = winston.loggers.add loggerOpts.name, loggerOpts.options
 
     return @loggers[loggerOpts.name]
 
+  ###*
+
+  Собирает все новости из источников объявленных в конфиг
+
+  @method fetchFeeds
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   fetchFeeds: (callback)->
 
     @logger.info "Start feeds fetching"
@@ -122,6 +186,16 @@ class Core
       callback
     )
 
+  ###*
+
+  Проверяет наличие директории, пытается создать если таковой нет
+
+  @method checkDirectory
+  @param path {String} путь до директории
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   checkDirectory: (path, callback)=>
 
     async.waterfall(
@@ -145,6 +219,17 @@ class Core
       callback
     )
 
+  ###*
+
+  Считывает файл в кодировке `utf8`, предварительно проверив его наличие
+
+  @method readFileIfExists
+  @param path {String}
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @param callback.result {String} содержимое файла
+  @async
+  ###
   readFileIfExists: (path, callback)=>
 
     fs.exists path, (exists)->
@@ -153,6 +238,19 @@ class Core
       else
         callback "File is not exists"
 
+  ###*
+
+  Получает все новости из `mysql` или статичных файлов (если mysql нет) с простейшей пагинацией
+
+  @method getItems
+  @param skip {Number} пропуск первых записей
+  @param limit {Number} кол-во запрашиваемых записей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @param callback.result.items {Object} массив новостей
+  @param callback.result.count {Object} общее кол-во новостей
+  @async
+  ###
   getItems: (skip, limit, callback)=>
 
     if @mysql.connected()
@@ -163,6 +261,19 @@ class Core
 
       @getItemsFromStatic skip, limit, callback
 
+  ###*
+
+  Получает все новости из `mysql` с простейшей пагинацией
+
+  @method getItemsFromMysql
+  @param skip {Number} пропуск первых записей
+  @param limit {Number} кол-во запрашиваемых записей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @param callback.result.items {Object} массив новостей
+  @param callback.result.count {Object} общее кол-во новостей
+  @async
+  ###
   getItemsFromMysql: (skip, limit, callback)=>
 
     async.parallel(
@@ -179,6 +290,19 @@ class Core
         }
     )
 
+  ###*
+
+  Получает все новости из статичных файлов с простейшей пагинацией
+
+  @method getItemsFromStatic
+  @param skip {Number} пропуск первых записей
+  @param limit {Number} кол-во запрашиваемых записей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @param callback.result.items {Object} массив новостей
+  @param callback.result.count {Object} общее кол-во новостей
+  @async
+  ###
   getItemsFromStatic: (skip, limit, callback)=>
     async.waterfall(
       [
@@ -202,6 +326,16 @@ class Core
       callback
     )
 
+  ###*
+
+  Получает одну новость по запросу `id` (либо ID mysql, либо название файла статики)
+
+  @param id {Number} ID новости
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @param callback.result {Object} объект новости
+  @async
+  ###
   getItem: (id, callback)=>
     if @mysql.connected()
       @mysql.find "items", {id}, (err, [item])=>
@@ -217,8 +351,21 @@ class Core
             err = "Cannot parse file"
         callback err, content
 
+  ###*
+
+  Пересохраняет общий конфиг проекта
+
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   saveSettings: (callback)=>
-    fs.writeFile path.join(__dirname, "..", "config/config.json"), JSON.stringify(@config, "    ", "    "), encoding: "utf8", callback
+    fs.writeFile(
+      path.join(__dirname, "..", "config/config.json")
+      JSON.stringify(@config, "    ", "    ")
+      encoding: "utf8"
+      callback
+    )
 
 
 module.exports = Core

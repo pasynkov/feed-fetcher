@@ -3,13 +3,37 @@ mysql = require "mysql"
 _ = require "underscore"
 async = require "async"
 
-
+###*
+Класс-фетчер. Родительский класс для остыльных фетчеров. Умеет доставать и сохранять новости
+@class Mysql
+@constructor
+###
 class Mysql
 
+
+  ###*
+  Конструктор класса
+  @method constructor
+  ###
   constructor: ->
 
+
+    ###*
+
+    Конфиг mysql
+
+    @property config
+    @type {Object}
+    ###
     @config = core.config.mysql
 
+    ###*
+
+    Логгер
+
+    @property logger
+    @type {Object}
+    ###
     @logger = core.createLogger(
       name: "mysql"
       options:
@@ -19,9 +43,25 @@ class Mysql
           label: "Mysql"
     )
 
+    ###*
+
+    MySQL-клиент
+
+    @propery client
+    @type {Object}
+    ###
     @client = mysql.createConnection @config
 
 
+  ###*
+
+  Коннектится к базе из конфига
+
+  @method connect
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   connect: (callback)=>
 
     @logger.info "Start connect"
@@ -37,10 +77,28 @@ class Mysql
 
       callback err
 
+  ###*
+
+  Проверяет есть ли коннект к базе
+
+  @method connected
+  @return result {Boolean} результат запроса
+  ###
   connected: ->
     return @client.state is "authenticated"
 
 
+  ###*
+
+  Сохраняет массив объектов в базе
+
+  @method insertRows
+  @param tableName {String} имя таблицы
+  @param rows {Array} массив объектов для инсерта
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   insertRows: (tableName, rows, callback)->
 
     names = _.keys rows[0]
@@ -57,6 +115,17 @@ class Mysql
 
     @client.query "INSERT INTO ?? (??) VALUES ?", [tableName, names, rows], callback
 
+  ###*
+
+  Сохраняет массив объектов в базе, причем по одному
+
+  @method insertRowsByOne
+  @param tableName {String} имя таблицы
+  @param rows {Array} массив объектов для инсерта
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   insertRowsByOne: (tableName, rows, callback)->
 
     async.map(
@@ -66,6 +135,17 @@ class Mysql
       callback
     )
 
+  ###*
+
+  Совершает `SELECT`-запрос к базе и достает записи по запросу `where`
+
+  @method find
+  @param tableName {String} имя таблицы
+  @param where {Object} ключ-значение соответствия строки
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   find: (tableName, where, callback)=>
 
     keys = _.map(

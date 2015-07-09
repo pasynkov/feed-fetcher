@@ -3,12 +3,34 @@ Handlebars = require "handlebars"
 async = require "async"
 _ = require "underscore"
 
+###*
+Главный контроллер проекта
+@class MainController
+@constructor
+###
 class MainController
 
 
+  ###*
+  Конструктор класса
+  @method constructor
+  ###
   constructor: (@context)->
 
+    ###*
 
+    Экземпляр класса Context запроса
+
+    @property context
+    @type {Context}
+    ###
+
+  ###*
+
+  Возвращает главную страницу приложения
+
+  @method index
+  ###
   index: ->
 
     async.waterfall(
@@ -28,6 +50,12 @@ class MainController
       @context.sendData
     )
 
+  ###*
+
+  Возвращает страницу настроек приложения
+
+  @method settings
+  ###
   settings: (incomingError)->
 
     async.waterfall(
@@ -53,11 +81,21 @@ class MainController
         @context.sendData incomingError or err, data
     )
 
+  ###*
+
+  Возвращает список новостей
+
+  @method getItems
+  ###
   getItems: ->
 
     async.waterfall(
       [
-        async.apply core.getItems, (@context.requester.params.page*core.config.ui.perPage or 0), core.config.ui.perPage
+        async.apply(
+          core.getItems
+          @context.requester.params.page*core.config.ui.perPage or 0
+          core.config.ui.perPage
+        )
         ({items, count}, taskCallback)=>
 
           taskCallback null, {
@@ -87,9 +125,21 @@ class MainController
       @context.sendData
     )
 
+  ###*
+
+  Возвращает одну новость по ID
+
+  @method getItem
+  ###
   getItem: ->
     core.getItem @context.requester.params.id, @context.sendData
 
+  ###*
+
+  Сохраняет настройки приложения
+
+  @method saveSettings
+  ###
   saveSettings: =>
 
     core.config.ui.perPage = @context.requester.body.perPage

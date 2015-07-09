@@ -1,10 +1,36 @@
 
 revalidator = require "revalidator"
 
+###*
+Валидатор материала
+@class ItemValidator
+@constructor
+###
 class ItemValidator
 
+  ###*
+  Конструктор класса
+  @method constructor
+  ###
   constructor: (@object)->
 
+
+    ###*
+
+    Объект валидации
+
+    @property object
+    @type {Object}
+    ###
+
+
+    ###*
+
+    Схема валидации
+
+    @property schema
+    @type {Object}
+    ###
     @schema = {
       type: "object"
       required: true
@@ -56,6 +82,14 @@ class ItemValidator
 
     @validate()
 
+  ###*
+
+  Валидирует объект по схеме и назначает свойства
+
+  `@valid`, `@error` по результатам валидации
+
+  @method validate
+  ###
   validate: ->
 
     {@valid, @errors} = revalidator.validate @object, @schema

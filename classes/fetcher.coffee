@@ -13,8 +13,18 @@ ItemValidator = require "../schemas/item"
 
 DEFAULT_STATIC_DIR = "content"
 
+
+###*
+Класс-фетчер. Родительский класс для остыльных фетчеров. Умеет доставать и сохранять новости
+@class Fetcher
+@constructor
+###
 class Fetcher
 
+  ###*
+  Конструктор класса
+  @method constructor
+  ###
   constructor: ->
 
 
@@ -100,7 +110,16 @@ class Fetcher
 
       callback null, items
 
+  ###*
 
+  Валидирует и сохраняет входящие новости в доступное хранилище
+
+  @method storeItems
+  @param items {Array} массив новостей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   storeItems: (items, callback)=>
 
     items = @validateItems items
@@ -119,6 +138,16 @@ class Fetcher
 
       @storeItemsToStatic items, callback
 
+  ###*
+
+  Сохраняет входящие новости в mysql
+
+  @method storeItemsToMysql
+  @param items {Array} массив новостей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   storeItemsToMysql: (items, callback)=>
 
     async.map(
@@ -139,6 +168,16 @@ class Fetcher
       callback
     )
 
+  ###*
+
+  Сохраняет входящие новости в статичных файлах
+
+  @method storeItemsToStatic
+  @param items {Array} массив новостей
+  @param callback {Function}
+  @param callback.error {String|null} возвращает строку с ошибкой или `null`
+  @async
+  ###
   storeItemsToStatic: (items, callback)=>
 
     staticPath = path.join(__dirname, "..", core.config.fetcher.staticDir or DEFAULT_STATIC_DIR)
@@ -172,6 +211,14 @@ class Fetcher
       callback
     )
 
+  ###*
+
+  Валидирует входящие новости, возвращает только те, что прошли валидацию
+
+  @method validateItems
+  @param items {Array} массив новостей
+  @return items {Array} массив валидных записей
+  ###
   validateItems: (items)->
 
     return _.compact _.map(
