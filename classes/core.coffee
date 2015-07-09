@@ -84,7 +84,8 @@ class Core
       initializers.push @mysql.connect
 
     if @config.cron
-      initializers.push @createCronTask(@config.cron)
+      for task in @config.cron
+        initializers.push @createCronTask(task)
 
 
 
