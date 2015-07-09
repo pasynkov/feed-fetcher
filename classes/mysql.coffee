@@ -71,11 +71,18 @@ class Mysql
 
         @logger.error "Connection failed with error: `#{err}`"
 
+        callback err
+
       else
 
         @logger.info "Connected successfully"
 
-      callback err
+        core.readFileIfExists "./src/item.sql", (err, sql)=>
+          if err
+            callback err
+          else
+            @client.query sql, callback
+
 
   ###*
 
