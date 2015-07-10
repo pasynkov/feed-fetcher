@@ -70,7 +70,7 @@ class MainController
           indexTemplate = Handlebars.compile index
           menu = Handlebars.compile(menu) settingsActive: "active"
           settings = Handlebars.compile(settings) {
-            cron: core.config.cron.runOn
+            cron: core.config.cron[0].runOn
             perPage: core.config.ui.perPage
             staticDir: core.config.fetcher.staticDir
           }
@@ -143,11 +143,18 @@ class MainController
   saveSettings: =>
 
     core.config.ui.perPage = @context.requester.body.perPage
-    core.config.cron.runOn = @context.requester.body.cron
+    core.config.cron[0].runOn = @context.requester.body.cron
     core.config.fetcher.staticDir = @context.requester.body.staticDir
 
     core.saveSettings (err)=>
-      @settings err
+
+      for cronTask, job of core.crons
+        job.stop()
+
+      for newJob in core.config.cron
+        core.createCronTask(newJob) (err)=>
+
+          @settings err
 
 
 

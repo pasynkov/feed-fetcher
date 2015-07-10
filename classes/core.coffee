@@ -46,6 +46,15 @@ class Core
 
     ###*
 
+    Планировщики заданий
+
+    @property crons
+    @type {Object}
+    ###
+    @crons = {}
+
+    ###*
+
     Основной логгер
 
     @property logger
@@ -109,7 +118,7 @@ class Core
     @logger.info "Add cron task `#{config.script}`"
 
     return (taskCallback)=>
-      new CronJob({
+      @crons[config.script] = new CronJob({
         cronTime: config.runOn
         onTick: =>
 
@@ -128,7 +137,9 @@ class Core
 
         start: false
         timeZone: "Europe/Moscow"
-      }).start()
+      })
+
+      @crons[config.script].start()
 
       taskCallback()
 
